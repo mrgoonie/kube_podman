@@ -6,6 +6,7 @@ services:
             context: .
             platforms:
               - "linux/amd64"
+              - "linux/arm64"
             tags:
               - mrgoonie/kube-podman:1
             cache_to:
@@ -27,9 +28,9 @@ services:
             - sys_admin
             - mknod
         # ----------- [END] FOR PODMAN TO RUN INSIDE DOCKER ----------
-        volumes:
+        # volumes:
             # HOST:CONTAINER
-            - ./storage/home:/home/app
+            # - ./storage/home:/home/app
         environment:
             - TZ=Asia/Ho_Chi_Minh
             - NODE_ENV=production

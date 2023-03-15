@@ -4,11 +4,32 @@
 
 ```bash
 docker buildx create --driver docker-container --name kube_podman
-docker buildx build --platform=linux/amd64 -f Dockerfile -t mrgoonie/kube-podman:1 --cache-from=type=registry,ref=mrgoonie/kube-podman --builder kube_podman .
+docker buildx build --platform=linux/amd64 -f Dockerfile -t mrgoonie/kube-podman:2 --cache-from=type=registry,ref=mrgoonie/kube-podman --builder kube_podman .
 ```
 
-## Develop
+## Run development
 
 ```bash
 docker compose -f docker-compose.dev.yaml up --build
 ```
+
+## Run production
+
+```bash
+docker compose -f docker-compose.dev.yaml up --build
+```
+
+## Deploy on Kubernetes
+
+```bash
+kubectl create ns kube-podman
+kubectl apply -f deployment.yaml
+```
+
+## Known issues
+
+## Credits
+
+Duy Nguyen <duy@wearetopgroup.com>
+
+Good luck!

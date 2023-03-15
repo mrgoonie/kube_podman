@@ -93,6 +93,7 @@ WORKDIR /usr/app
 # Configuration files for PODMAN to resolve "docker.io" registry shortname alias
 COPY ./podman/containers/registries.conf /etc/containers/registries.conf
 COPY ./podman/containers/containers.conf /etc/containers/containers.conf
+COPY ./podman/containers/storage.conf /etc/containers/storage.conf
 
 # RUN yarn build
 
@@ -135,24 +136,26 @@ COPY startup.sh startup.sh
 RUN chmod -R +x /usr/${user}/startup.sh
 
 # Podman permisions
+RUN mkdir -p /home/${user}/.config
 RUN mkdir -p /home/${user}/.local
-RUN mkdir -p /home/${user}/.local/share/containers/storage/overlay
-RUN mkdir -p /home/${user}/.local/share/containers/storage/mounts
-RUN mkdir -p /home/${user}/.local/share/containers/storage/cache
-RUN mkdir -p /home/${user}/.local/share/containers/storage/libpod
-RUN mkdir -p /home/${user}/.local/share/containers/storage/overlay-containers
-RUN mkdir -p /home/${user}/.local/share/containers/storage/overlay-images
-RUN mkdir -p /home/${user}/.local/share/containers/storage/overlay-layers
-RUN mkdir -p /home/${user}/.local/share/containers/storage/tmp
 
 # Make app user has rights to its home directory
 RUN chown -R ${uid}:${gid} /home/${user}
 RUN chmod -R ug+rwx /home/${user}
 
-# Switch to user
-USER ${uid}:${gid}
+# podman storage directory
+RUN mkdir -p /run/user/1000 && chmod 700 /run/user/1000
+RUN chown -R ${uid}:${gid} /run/user/1000
+RUN chmod -R ug+rwx /run/user/1000
 
-EXPOSE 6969
+COPY ./podman/containers/storage.conf /home/${user}/.config/containers/storage.conf
+RUN mkdir -p /var/tmp/${user}/containers/storage
+RUN chown -R ${uid}:${gid} /var/tmp/${user}/containers/storage
+RUN chmod -R ug+rwx /var/tmp/${user}/containers/storage
+
+# Switch to user
+ENV USER=${user}
+USER ${uid}:${gid}
 
 # CMD [ "/bin/sh", "-c", "sleep infinity" ]
 ENTRYPOINT [ "/usr/app/startup.sh" ]
