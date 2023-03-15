@@ -12,11 +12,11 @@ RUN apt-get clean
 
 # Node.js, Git, kubectl & Open SSH
 RUN apt-get update --allow-releaseinfo-change -yq \
-  && apt-get install curl wget -yq \
-  && curl -sL https://deb.nodesource.com/setup_16.x | bash \
-  && apt-get install nodejs git sed jq openssh-client -yq \
-  && apt-get autoremove -y \
-  && apt-get clean -y
+    && apt-get install curl wget -yq \
+    && curl -sL https://deb.nodesource.com/setup_16.x | bash \
+    && apt-get install nodejs git sed jq openssh-client -yq \
+    && apt-get autoremove -y \
+    && apt-get clean -y
 
 # Install GCLOUD CLI / SDK
 RUN apt-get install apt-transport-https ca-certificates gnupg -yq \
@@ -32,8 +32,8 @@ RUN apt-get install google-cloud-sdk-gke-gcloud-auth-plugin
 
 # Helm
 RUN curl -fsSL -o get_helm.sh https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3 \
-  && chmod 700 get_helm.sh \
-  && ./get_helm.sh
+    && chmod 700 get_helm.sh \
+    && ./get_helm.sh
 
 # Docker
 RUN apt-get install lsb-release \
@@ -44,24 +44,35 @@ RUN apt-get install lsb-release \
     && apt-get install docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin -yq
 
 # Docker Buildx
-RUN wget https://github.com/docker/buildx/releases/download/v0.9.1/buildx-v0.9.1.linux-amd64 \
-  && chmod a+x buildx-v0.9.1.linux-amd64 \
-  && mkdir -p ~/.docker/cli-plugins \
-  && mv buildx-v0.9.1.linux-amd64 ~/.docker/cli-plugins/docker-buildx
+COPY buildx-v0.9.1.linux-amd64 .
+
+RUN chmod a+x buildx-v0.9.1.linux-amd64 \
+    && mkdir -p ~/.docker/cli-plugins \
+    && mv buildx-v0.9.1.linux-amd64 ~/.docker/cli-plugins/docker-buildx
+
+# RUN wget https://github.com/docker/buildx/releases/download/v0.9.1/buildx-v0.9.1.linux-amd64 \
+#     && chmod a+x buildx-v0.9.1.linux-amd64 \
+#     && mkdir -p ~/.docker/cli-plugins \
+#     && mv buildx-v0.9.1.linux-amd64 ~/.docker/cli-plugins/docker-buildx
+
+RUN apt install fuse-overlayfs -yq
 
 # Podman
 RUN apt-get -y install podman iptables \
-  && apt-get clean -y
+    && apt-get clean -y
 
 # Install Digital Ocean CLI
 RUN cd ~ \
-  && wget https://github.com/digitalocean/doctl/releases/download/v1.78.0/doctl-1.78.0-linux-amd64.tar.gz \
-  && tar xf ~/doctl-1.78.0-linux-amd64.tar.gz \
-  && mv ~/doctl /usr/local/bin
+    && wget https://github.com/digitalocean/doctl/releases/download/v1.78.0/doctl-1.78.0-linux-amd64.tar.gz \
+    && tar xf ~/doctl-1.78.0-linux-amd64.tar.gz \
+    && mv ~/doctl /usr/local/bin
 
 # Install PNPM (instead of YARN as the previous version)
 # RUN npm install -g yarn
 RUN npm install -g pnpm
+
+# FOR DEVELOPMENT ONLY
+RUN apt-get install vim -yq
 
 # Set 1ing directory
 WORKDIR /usr/app
@@ -149,9 +160,18 @@ RUN chown -R ${uid}:${gid} /run/user/1000
 RUN chmod -R ug+rwx /run/user/1000
 
 COPY ./podman/containers/storage.conf /home/${user}/.config/containers/storage.conf
+COPY ./podman/containers/storage.conf /root/.config/containers/storage.conf
+RUN chmod -R ug+rwx /home/${user}/.config/containers/storage.conf
+
 RUN mkdir -p /var/tmp/${user}/containers/storage
 RUN chown -R ${uid}:${gid} /var/tmp/${user}/containers/storage
 RUN chmod -R ug+rwx /var/tmp/${user}/containers/storage
+
+RUN touch /etc/sub{u,g}id
+# RUN usermod --add-subuids 10000-75535 ${user}
+# RUN usermod --add-subgids 10000-75535 ${user}
+RUN chmod 755 /etc/subuid
+RUN chmod 755 /etc/subgid
 
 # Switch to user
 ENV USER=${user}

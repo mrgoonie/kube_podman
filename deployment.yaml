@@ -25,27 +25,40 @@ spec:
     spec:
       containers:
         - name: kube-podman
-          image: mrgoonie/kube-podman:2
-          ports:
-            - containerPort: 6969
+          image: mrgoonie/kube-podman:9
           securityContext:
+            # run as "root" user
+            # runAsUser: 0
+            # run as "app" user
             runAsUser: 1000
             runAsGroup: 1000
-            seLinuxOptions:
-              type: spc_t
+            # seLinuxOptions:
+            #   type: spc_t
             capabilities:
               add:
                 - "SYS_ADMIN"
                 - "MKNOD"
                 - "SYS_CHROOT"
                 - "SETFCAP"
-                - "SYS_RESOURCE"
-                - "SETUID"
-                - "SETGID"
+            # capabilities:
+            #   add:
+            #     - "SYS_ADMIN"
+            #     - "MKNOD"
+            #     - "SYS_CHROOT"
+            #     - "SETFCAP"
+            #     - "SYS_RESOURCE"
+            #     - "SETUID"
+            #     - "SETGID"
           resources:
             limits:
               github.com/fuse: 1
-          env:
-            - name: TZ
-              value: Asia/Ho_Chi_Minh
-          
+          # env:
+          #   - name: TZ
+          #     value: Asia/Ho_Chi_Minh
+          # volumeMounts:
+          #   - mountPath: /home/app/.local/share/containers
+          #     name: podman-local
+      # volumes:
+      #   - name: podman-local
+      #     hostPath:
+      #       path: /home/dev/kube-podman/.local/share/containers

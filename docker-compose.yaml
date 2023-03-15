@@ -17,9 +17,9 @@ services:
             - sys_admin
             - mknod
         # ----------- [END] FOR PODMAN TO RUN INSIDE DOCKER ----------
-        volumes:
-            # HOST:CONTAINER
-            - ./storage/home:/home/app
+        # volumes:
+        #     # HOST:CONTAINER
+        #     - ./storage/home:/home/app
         environment:
             - TZ=Asia/Ho_Chi_Minh
             - NODE_ENV=production
