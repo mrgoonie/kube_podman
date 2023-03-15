@@ -1,0 +1,25 @@
+version: "3"
+services:
+    kube-podman:
+        image: mrgoonie/kube-podman
+        container_name: kube-podman
+        working_dir: /usr/app/
+        ports:
+            - "6969:6969"
+        restart: unless-stopped
+        # ----------- [START] FOR PODMAN TO RUN INSIDE DOCKER ----------
+        devices:
+            - "/dev/fuse"
+        security_opt:
+            - "seccomp=unconfined"
+            - "label=disable"
+        cap_add:
+            - sys_admin
+            - mknod
+        # ----------- [END] FOR PODMAN TO RUN INSIDE DOCKER ----------
+        volumes:
+            # HOST:CONTAINER
+            - ./storage/home:/home/app
+        environment:
+            - TZ=Asia/Ho_Chi_Minh
+            - NODE_ENV=production

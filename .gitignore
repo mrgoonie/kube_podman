@@ -1,0 +1,4 @@
+node_modules/
+
+# this directory is mounting to docker volume:
+storage/
