@@ -25,21 +25,22 @@ spec:
     spec:
       containers:
         - name: kube-podman
-          image: mrgoonie/kube-podman:9
+          image: mrgoonie/kube-podman:15
           securityContext:
+            privileged: true
             # run as "root" user
             # runAsUser: 0
             # run as "app" user
-            runAsUser: 1000
-            runAsGroup: 1000
+            # runAsUser: 1000
+            # runAsGroup: 1000
             # seLinuxOptions:
             #   type: spc_t
-            capabilities:
-              add:
-                - "SYS_ADMIN"
-                - "MKNOD"
-                - "SYS_CHROOT"
-                - "SETFCAP"
+            # capabilities:
+            #   add:
+            #     - "SYS_ADMIN"
+            #     - "MKNOD"
+            #     - "SYS_CHROOT"
+            #     - "SETFCAP"
             # capabilities:
             #   add:
             #     - "SYS_ADMIN"
@@ -49,16 +50,35 @@ spec:
             #     - "SYS_RESOURCE"
             #     - "SETUID"
             #     - "SETGID"
-          resources:
-            limits:
-              github.com/fuse: 1
+          # resources:
+          #   limits:
+          #     github.com/fuse: 1
           # env:
           #   - name: TZ
           #     value: Asia/Ho_Chi_Minh
           # volumeMounts:
-          #   - mountPath: /home/app/.local/share/containers
-          #     name: podman-local
+            #   - mountPath: /dev/fuse
+            #     name: fuse-device
+            # - mountPath: /var/tmp/app/containers/storage
+            #   name: podman-local
       # volumes:
-      #   - name: podman-local
+      #   - name: fuse-device
       #     hostPath:
-      #       path: /home/dev/kube-podman/.local/share/containers
+      #       path: /dev/fuse
+        # - name: podman-local
+        #   persistentVolumeClaim:
+        #     claimName: podman-local
+# ---
+# apiVersion: v1
+# kind: PersistentVolumeClaim
+# metadata:
+#   name: podman-local
+#   namespace: kube-podman
+# spec:
+#   storageClassName: local-path # Empty string must be explicitly set otherwise default StorageClass will be set
+#   volumeName: podman-local
+#   accessModes:
+#     - ReadWriteOnce
+#   resources:
+#     requests:
+#       storage: 20Gi

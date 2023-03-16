@@ -3,6 +3,8 @@ FROM debian:latest
 # Switch to "root" user
 # <--- Usually you won't be needed it - Depends on base image --->
 USER root
+# Enable password for "root" user
+# RUN echo "root:pass" | chpasswd
 
 # <-- Run privileged commands -->
 # RUN apt install <packages>
@@ -137,6 +139,9 @@ RUN groupadd -g ${gid} ${group}
 RUN useradd -u ${uid} -g ${group} -s /bin/sh -m ${user} 
 # <--- the '-m' create a user home directory
 
+# Enable password for "app" user
+# RUN echo "app:pass" | chpasswd
+
 # ----- HANDLING PERMISIONS ------
 
 # Permissions of DOCKER BUILDX
@@ -166,6 +171,9 @@ RUN chmod -R ug+rwx /home/${user}/.config/containers/storage.conf
 RUN mkdir -p /var/tmp/${user}/containers/storage
 RUN chown -R ${uid}:${gid} /var/tmp/${user}/containers/storage
 RUN chmod -R ug+rwx /var/tmp/${user}/containers/storage
+
+RUN mkdir -p /var/tmp/${user}/containers/storage
+RUN chown -R ${uid}:${gid} /var/tmp/${user}/containers/storage
 
 RUN touch /etc/sub{u,g}id
 # RUN usermod --add-subuids 10000-75535 ${user}
